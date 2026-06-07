@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - Belajar Asyik</title>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #74b9ff, #a29bfe); height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 360px; text-align: center; }
+        h2 { color: #2d3436; margin-bottom: 5px; }
+        p { color: #636e72; font-size: 14px; margin-bottom: 25px; }
+        .input-group { margin-bottom: 18px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 6px; color: #2d3436; font-size: 14px; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 12px; border: 2px solid #dfe6e9; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.2s; }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: #74b9ff; outline: none; }
+        .btn-login { background: #6c5ce7; color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-login:hover { background: #5b4cc4; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>🌟 Belajar Asyik</h2>
+    <p>Silakan pilih role untuk masuk aplikasi</p>
+
+    <form id="login-form">
+        <div class="input-group">
+            <label for="role">Masuk Sebagai</label>
+            <select id="role" onchange="aturFormInput()" required>
+                <option value="siswa">🎒 Siswa (Belajar & Kuis)</option>
+                <option value="guru">👨‍🏫 Guru (Dashboard Nilai)</option>
+            </select>
+        </div>
+
+        <div class="input-group" id="group-nama">
+            <label for="username">Nama Pengguna</label>
+            <input type="text" id="username" placeholder="Masukkan namamu..." required autocomplete="off">
+        </div>
+
+        <div class="input-group" id="group-absen">
+            <label for="absen">Nomor Absen Siswa</label>
+            <input type="number" id="absen" placeholder="Contoh: 15" min="1" required>
+        </div>
+
+        <div class="input-group" id="group-password" style="display: none;">
+            <label for="password">Kata Sandi Guru</label>
+            <input type="password" id="password" placeholder="Masukkan password rahasia..." style="width: 100%; padding: 12px; border: 2px solid #dfe6e9; border-radius: 8px; box-sizing: border-box; font-size: 16px;">
+        </div>
+
+        <button type="submit" class="btn-login">Masuk Aplikasi 🚀</button>
+    </form>
+</div>
+
+<script>
+    // Fungsi ajaib untuk menyembunyikan input nama jika memilih Guru
+    function aturFormInput() {
+        const role = document.getElementById('role').value;
+        const groupNama = document.getElementById('group-nama');
+        const groupAbsen = document.getElementById('group-absen');
+        const groupPassword = document.getElementById('group-password');
+        
+        const inputNama = document.getElementById('username');
+        const inputAbsen = document.getElementById('absen');
+        const inputPassword = document.getElementById('password');
+
+        if (role === 'guru') {
+            // Sembunyikan form siswa
+            groupNama.style.display = 'none';
+            groupAbsen.style.display = 'none';
+            inputNama.removeAttribute('required');
+            inputAbsen.removeAttribute('required');
+
+            // Munculkan form password guru
+            groupPassword.style.display = 'block';
+            inputPassword.setAttribute('required', 'true');
+        } else {
+            // Munculkan kembali form siswa
+            groupNama.style.display = 'block';
+            groupAbsen.style.display = 'block';
+            inputNama.setAttribute('required', 'true');
+            inputAbsen.setAttribute('required', 'true');
+
+            // Sembunyikan form password guru
+            groupPassword.style.display = 'none';
+            inputPassword.removeAttribute('required');
+        }
+    }
+
+   document.getElementById('login-form').addEventListener('submit', function(e) {
+        // Matikan aksi refresh bawaan form Android WebView agar tidak freeze
+        e.preventDefault();
+        
+        const roleInput = document.getElementById('role').value;
+
+        if (roleInput === 'guru') {
+            const passwordInput = document.getElementById('password').value;
+            
+            if (passwordInput !== 'guru123') {
+                alert('❌ Kata Sandi Guru Salah! Akses ditolak.');
+                return;
+            }
+
+            const sessionUser = {
+                id_user: 1,
+                username: "Guru Monitor",
+                role: "guru"
+            };
+            localStorage.setItem('activeUser', JSON.stringify(sessionUser));
+            
+            // Berikan jeda waktu 100ms agar Android selesai menulis ke memori sebelum pindah halaman
+            setTimeout(function() {
+                window.location.replace('guru.html');
+            }, 100);
+
+        } else {
+            // Jika yang masuk adalah Siswa
+            const usernameInput = document.getElementById('username').value.trim();
+            const absenInput = document.getElementById('absen').value;
+
+            if (!usernameInput || !absenInput) {
+                alert('❌ Nama dan Nomor Absen harus diisi!');
+                return;
+            }
+
+            // 🛡️ VALIDASI BARU: Nama tidak boleh mengandung angka
+            const regexHuruf = /^[a-zA-Z\s]+$/;
+            if (!regexHuruf.test(usernameInput)) {
+                alert('❌ Nama tidak boleh mengandung angka atau simbol! Gunakan huruf saja.');
+                return;
+            }
+
+            // 🛡️ VALIDASI REAL-TIME: Tembak ke endpoint check-absen sebelum diizinkan masuk index.html
+            // CATATAN: Ganti 127.0.0.1 ke IP WiFi Laptop kalian jika ingin merakit APK untuk HP!
+            fetch('https://belajar-asyik-backend.onrender.com/api/check-absen', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nama_siswa: usernameInput,
+                    no_absen: parseInt(absenInput)
+                })
+            })
+            .then(async res => {
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.error); // Munculkan pesan penolakan dari backend jika absen duplikat
+                    throw new Error(data.error);
+                }
+                return data;
+            })
+            .then(data => {
+                // Jika sukses lolos sensor absen duplikat, barulah simpan sesi & alihkan halaman
+                const sessionUser = {
+                    id_user: 2,
+                    username: usernameInput,
+                    no_absen: parseInt(absenInput),
+                    role: "siswa",
+                    avatar: "🐰"
+                };
+                localStorage.setItem('activeUser', JSON.stringify(sessionUser));
+                
+                setTimeout(function() {
+                    window.location.replace('index.html');
+                }, 100);
+            })
+            .catch(err => {
+                console.error("Validasi login dihentikan:", err.message);
+            });
+        }
+    });
+</script>
+</body>
+</html>
