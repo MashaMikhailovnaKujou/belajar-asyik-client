@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script>
+  // Cek apakah pengguna baru membuka aplikasi (belum melewati proses login)
+  if (!sessionStorage.getItem("isLoggedIn")) {
+      // Tendang langsung ke halaman login.html
+      window.location.href = "login.html"; 
+  }
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Belajar Asyik - Kelas 3 SD | Animasi Seru</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <div class="app-header">
+        <button class="back-header-btn" id="globalBackBtn" style="visibility: hidden;">←</button>
+        <h1>📚 Belajar Asyik Kelas 3</h1>
+        <button class="sound-btn" id="toggleSound">🔊</button>
+    </div>
+    <div id="mainContent" class="main-content"></div>
+    <div class="bottom-nav" id="bottomNav">
+        <div class="nav-item active" data-nav="home">🏠 Beranda</div>
+        <div class="nav-item" data-nav="materi">📖 Materi</div>
+        <div class="nav-item" data-nav="profil">⭐ Profil</div>
+    </div>
+</div>
+      <div class="avatar-circle-besar">
+    <span id="avatar-siswa">🐰</span> 
+</div>
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
